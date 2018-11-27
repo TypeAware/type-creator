@@ -7,6 +7,13 @@ import {EVCb} from "./shared";
 export interface Generation {
   generateToStream: (input: object, strm: Writable, cb: EVCb<any>) => void;
   generate?: () => void;
+  filePath: string
+}
+
+export interface Task {
+  lang: string,
+  gen: Generation,
+  output: {folder: string}
 }
 
 export interface GenerationMap {

@@ -292,7 +292,8 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
 };
 
 export const generation = {
-  generateToStream
+  generateToStream,
+  filePath: __filename
 };
 
 // const f = process.env.input_file;

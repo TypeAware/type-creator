@@ -4,8 +4,7 @@
   "description": "Semver-oriented TypeScript library skeleton.",
   "main": "dist/main.js",
   "bin": {
-    "example": "cli/example.sh",
-    "example.js": "cli/example.js"
+    "type_creator": "cli/tc.js"
   },
   "types": "dist/main.d.ts",
   "typings": "dist/main.d.ts",
@@ -29,8 +28,11 @@
     "url": "https://github.com/ORESoftware/type-creator/issues"
   },
   "homepage": "https://github.com/ORESoftware/type-creator#readme",
-  "dependencies": {},
+  "dependencies": {
+    "async": "^2.6.1"
+  },
   "devDependencies": {
+    "@types/async": "^2.0.50",
     "@types/node": "^9.6.2"
   }
 }
