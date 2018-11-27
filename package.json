@@ -2,13 +2,13 @@
   "name": "type-creator",
   "version": "0.0.1001",
   "description": "Semver-oriented TypeScript library skeleton.",
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "bin": {
     "example": "cli/example.sh",
     "example.js": "cli/example.js"
   },
-  "types": "dist/index.d.ts",
-  "typings": "dist/index.d.ts",
+  "types": "dist/main.d.ts",
+  "typings": "dist/main.d.ts",
   "scripts": {
     "test": "suman test",
     "postinstall": "./assets/postinstall.sh"
@@ -23,7 +23,7 @@
     "skeleton",
     "scaffold"
   ],
-  "author": "TODO Yo.Mama",
+  "author": "Olegzandr VD",
   "license": "SEE LICENSE IN LICENSE.md",
   "bugs": {
     "url": "https://github.com/ORESoftware/type-creator/issues"
