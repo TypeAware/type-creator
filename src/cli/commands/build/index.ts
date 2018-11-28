@@ -30,8 +30,8 @@ assert(
 
 
 const tasks : Array<Task> = conf.default.tasks;
-
 const rootBuildFolder = conf.default.buildFolder;
+
 assert(
   rootBuildFolder && typeof rootBuildFolder === 'string',
   'No rootBuildFolder given by task: ' + conf
@@ -40,15 +40,12 @@ assert(
 
 async.eachLimit(tasks, 3, (t, cb) => {
   
-  
   const generatorPath = t.gen.filePath;
   const outputFolder = t.output.folder;
   
-  
   assert(outputFolder, 'No outputFolder given by task: ' + util.inspect(t));
   assert(generatorPath, 'No filepath given by task: ' + util.inspect(t));
-  
-  const outputFile = path.resolve(outputFolder,)
+  const outputDir = path.resolve(rootBuildFolder,outputFolder);
   
   const k = cp.spawn('bash', [], {
       env: Object.assign({}, process.env, {
@@ -57,18 +54,24 @@ async.eachLimit(tasks, 3, (t, cb) => {
   });
   
   const cmd = `
-  mkdir -p "${}";
-  node ${run} -p "${generatorPath}" -o "${outputFile}";
+      mkdir -p "${outputDir}";
+      node ${run} -p "${generatorPath}" -o "${outputDir}" -i "${inputFile}";
   `;
   
   k.stdin.end(cmd);
 
   k.once('exit', code => {
   
+    let err = null;
+    
     if(code > 0){
       console.error('Could not run command:', cmd, 'successfully.');
+      err = new Error(String(code));
     }
-  })
+    
+    cb(err);
+    
+  });
 
 }, err => {
   
