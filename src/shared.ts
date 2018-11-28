@@ -14,6 +14,11 @@ export class Lang {
   
 }
 
+
+export const flattenDeep = (v: Array<any>): Array<any> => {
+  return v.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
+};
+
 export type EVCb<T> = (err: any, val?: T) => void;
 
 

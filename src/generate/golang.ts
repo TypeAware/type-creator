@@ -13,9 +13,6 @@ import {any} from "async";
 
 const {conf} = new Lang({lang: 'golang'});
 
-const flattenDeep = (v: Array<any>): Array<any> => {
-  return v.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
-};
 
 const getString = (b: any) => {
 

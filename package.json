@@ -4,7 +4,7 @@
   "description": "Semver-oriented TypeScript library skeleton.",
   "main": "dist/main.js",
   "bin": {
-    "type_creator": "cli/tc.js"
+    "type_creator": "cli/cli.sh"
   },
   "types": "dist/main.d.ts",
   "typings": "dist/main.d.ts",
