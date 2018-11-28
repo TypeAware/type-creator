@@ -9,8 +9,8 @@ import * as util from "util";
 import * as path from "path";
 
 const run = require.resolve('./run.js');
-const inputFile = process.env.input_file;
-const confFile = process.env.conf_file;
+const inputFile = process.env.input_filex;
+const confFile = process.env.conf_filex;
 
 const conf = require(confFile);
 const input = require(inputFile);
@@ -42,9 +42,11 @@ async.eachLimit(tasks, 3, (t, cb) => {
   
   const generatorPath = t.gen.filePath;
   const outputFolder = t.output.folder;
+  const outputFile = t.output.file;
   
   assert(outputFolder, 'No outputFolder given by task: ' + util.inspect(t));
   assert(generatorPath, 'No filepath given by task: ' + util.inspect(t));
+  assert(outputFile, 'No output file given by task: ' + util.inspect(t));
   const outputDir = path.resolve(rootBuildFolder,outputFolder);
   
   // const k = cp.spawn('bash', [], {
@@ -57,7 +59,7 @@ async.eachLimit(tasks, 3, (t, cb) => {
   
   const cmd = `
       mkdir -p "${outputDir}";
-      node ${run} -p "${generatorPath}" -o "${outputDir}" -i "${inputFile}";
+      node ${run} -p '${generatorPath}' -o '${outputDir}' -i '${inputFile}' -f '${outputFile}';
   `;
   
   k.stdout.pipe(process.stdout);

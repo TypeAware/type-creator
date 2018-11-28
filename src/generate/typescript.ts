@@ -72,26 +72,19 @@ const reduceToFlatList = function (list: Array<any>): Array<string> {
 // const list = ['Array', 'Map<%s,%s, %s>', ['xxx', 'Map<%s,%s>', ['string', 'boolean'], 'number']];
 // console.error(reduceToFlatList(list));
 
-const appendFileHandler = (err: any) => {
-  if(err){
-    console.error(err);
-  }
+const appendFileHandler = (err: any, d?: any) => {
+    console.error({err,d});
 };
 
-const generateToStream = (input: object, o: stream.Writable, cb: EVCb<any>) => {
+const generateToStream = (input: object, o: stream.Writable, file: string, cb: EVCb<any>) => {
   
   // const input = require(src);
   // assert(input.entities, 'no entities exported from .js file.');
   
-  console.error('we writing to file.');
-  
-  // const file = '/home/oleg/codes/oresoftware/types-depot/builds/typescript/foo.ts';
-  
-  const file = '/home/oleg/codes/oresoftware/types-depot/test/inner/output.js';
-  
   const outStrm = {
     write(d: string){
-      fs.appendFile(file,d, appendFileHandler);
+      fs.appendFileSync(file,d);
+      // fs.appendFile(file,d, appendFileHandler);
     },
     end(){
     
@@ -99,7 +92,7 @@ const generateToStream = (input: object, o: stream.Writable, cb: EVCb<any>) => {
   };
   
   console.log('zoooom');
-  outStrm.write('export namespace Entities {');
+  outStrm.write('export namespace Entities {\n');
   
   const loop =  (v: any, parent: any, spaceCount: number, withinInterface: boolean) => {
     
@@ -302,7 +295,7 @@ const generateToStream = (input: object, o: stream.Writable, cb: EVCb<any>) => {
   
   loop(input, null, 2, false);
   
-  outStrm.write('\n}');
+  outStrm.write('}\n');
   outStrm.end();
   
   process.nextTick(function(){

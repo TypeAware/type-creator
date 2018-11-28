@@ -16,6 +16,9 @@ const outputDir = process.argv[index_o];
 const index_i = process.argv.indexOf('-i') + 1;
 const inputFile = process.argv[index_i];
 
+const index_f = process.argv.indexOf('-f') + 1;
+const outputFile = process.argv[index_f];
+
 const {generation} = <{generation:Generation}>require(generatorPath);
 
 // const strm = fs.createWriteStream(path.resolve(outputDir + '/foo1.js'));
@@ -28,19 +31,17 @@ const {generation} = <{generation:Generation}>require(generatorPath);
 //   }
 // });
 
-// const file = path.resolve(outputDir + '/foo2.js');
+const file = path.resolve(outputDir + '/' + outputFile);
 
-const file = '/home/oleg/codes/oresoftware/types-depot/test/inner/output.js';
-console.error({file});
+const t : any = null;
+// const t = fs.createWriteStream(file, {flags: 'a', encoding: 'utf-8'});
+// // t.pipe(fs.createWriteStream(file, {flags: 'w', encoding: 'utf-8',mode: 0o666}));
+//
+// t.write('zooooom', function(){
+//   console.log('flushed');
+// });
 
-const t = fs.createWriteStream(file, {flags: 'a', encoding: 'utf-8'});
-// t.pipe(fs.createWriteStream(file, {flags: 'w', encoding: 'utf-8',mode: 0o666}));
-
-t.write('zooooom', function(){
-  console.log('flushed');
-});
-
-console.log('super');
+// console.log('super');
 // t.push('fudge');
 
 const {tc} = require(inputFile);
@@ -50,17 +51,37 @@ const v = tc.entitiesMap.get('default');
 // console.log({v});
 // console.log({generation});
 
-generation.generateToStream(v, t, err => {
+if(generation.generateToFiles){
+  
+  
+  generation.generateToFiles(outputDir,v, err => {
+  
+    if(err){
+      throw err;
+    }
+  
+    console.log('Looks like things went well.');
+    process.exit(0);
+    
+  });
+  
+}
+else{
+  
+  generation.generateToStream(v, t, file, err => {
+    
+    
+    if(err){
+      throw err;
+    }
+    
+    console.log('Looks like things went well.');
+    process.exit(0);
+    
+  });
+}
 
 
-  if(err){
-    throw err;
-  }
-
-  console.log('Looks like things went well.');
-  process.exit(0);
-
-});
 
 
 

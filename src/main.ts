@@ -8,6 +8,9 @@ export const r2gSmokeTest = function () {
 import * as typeUtils from './type-utils';
 import * as defaults from './defaults';
 import * as symbols from './symbols';
+import {generators} from './generators';
+
+export {generators};
 
 
 export interface SymbolMap {

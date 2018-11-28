@@ -20,7 +20,6 @@ const typeMapPrototype = {
   }
 };
 
-
 export const set = (...args: any[]) => {
   const o = args.pop();
   if (!(o && typeof o === 'object')) {
@@ -34,6 +33,23 @@ export const set = (...args: any[]) => {
       throw new Error('Value should be a Symbol, but isnt: ' + v);
     }
     o[v] = true;
+  }
+  return o;
+};
+
+
+export const setNew = <T = any>(args: symbol[], o: T): T => {
+  if (!(o && typeof o === 'object')) {
+    throw new Error('Final argument must be a non-array object.');
+  }
+  if (Array.isArray(o)) {
+    throw new Error('Final argument must be a non-array object.');
+  }
+  for (let v of args) {
+    if (typeof v !== 'symbol') {
+      throw new Error('Value should be a Symbol, but isnt: ' + v);
+    }
+    (o as any)[v] = true;
   }
   return o;
 };
