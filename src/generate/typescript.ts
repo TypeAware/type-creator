@@ -8,6 +8,7 @@ import {Lang, joinMessages, EVCb} from "../shared";
 import * as util from "util";
 import {TypeElaboration} from "../type-utils";
 import * as stream from "stream";
+import * as fs from "fs";
 
 const {conf} = new Lang({lang: 'typescript'});
 
@@ -71,14 +72,34 @@ const reduceToFlatList = function (list: Array<any>): Array<string> {
 // const list = ['Array', 'Map<%s,%s, %s>', ['xxx', 'Map<%s,%s>', ['string', 'boolean'], 'number']];
 // console.error(reduceToFlatList(list));
 
-const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>) => {
+const appendFileHandler = (err: any) => {
+  if(err){
+    console.error(err);
+  }
+};
+
+const generateToStream = (input: object, o: stream.Writable, cb: EVCb<any>) => {
   
   // const input = require(src);
   // assert(input.entities, 'no entities exported from .js file.');
   
-  const result: Array<string> = [
-    'export namespace Entities {'
-  ];
+  console.error('we writing to file.');
+  
+  // const file = '/home/oleg/codes/oresoftware/types-depot/builds/typescript/foo.ts';
+  
+  const file = '/home/oleg/codes/oresoftware/types-depot/test/inner/output.js';
+  
+  const outStrm = {
+    write(d: string){
+      fs.appendFile(file,d, appendFileHandler);
+    },
+    end(){
+    
+    }
+  };
+  
+  console.log('zoooom');
+  outStrm.write('export namespace Entities {');
   
   const loop =  (v: any, parent: any, spaceCount: number, withinInterface: boolean) => {
     
@@ -123,20 +144,20 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
         if (!(rhs && typeof rhs === 'string')) {
           throw new Error('Parent has a "chld.literal" tag, but child value is not a string.');
         }
-        
-        result.push(space + `${cleanKey}: ${rhs},`);
+  
+        outStrm.write(space + `${cleanKey}: ${rhs},`);
         continue;
       }
       
       if (!(rhs && typeof rhs === 'object')) {
-        result.push(space + `${cleanKey}: '${rhs}',`);
+        outStrm.write(space + `${cleanKey}: '${rhs}',\n`);
         continue;
       }
       
       if (rhs[generic.Literal] === true) {
         {
           const val = rhs.link;
-          result.push(space + `${cleanKey}: ${val},`);
+          outStrm.write(space + `${cleanKey}: ${val},\n`);
         }
         continue;
       }
@@ -144,7 +165,7 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
       if (rhs[generic.TypeLink] === true) {
         {
           const val = rhs.link;
-          result.push(space + `${cleanKey}: ${val},`);
+          outStrm.write(space + `${cleanKey}: ${val},\n`);
         }
         continue;
       }
@@ -152,7 +173,7 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
       if (rhs[generic.TypeMap] === true) {
         {
           const val = getString(rhs);
-          result.push(space + `${cleanKey}: ${val},`);
+          outStrm.write(space + `${cleanKey}: ${val},\n`);
         }
         continue;
       }
@@ -167,10 +188,10 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
           
           if (elab.type) {
             const val = getString(elab);
-            result.push(space + `${cleanKey}: ${val},`);
+            outStrm.write(space + `${cleanKey}: ${val},\n`);
           }
           else if (elab.link) {
-            result.push(space + `${cleanKey}: ${elab.link},`);
+            outStrm.write(space + `${cleanKey}: ${elab.link},\n`);
           }
           else if (elab.linkfn) {
             const val = elab.linkfn();
@@ -181,16 +202,14 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
             if (!name) {
               throw new Error('Cannot refer to a namespace which is not in scope.');
             }
-            result.push(space + `${cleanKey}: ${String(name)},`);
+            outStrm.write(space + `${cleanKey}: ${String(name)},\n`);
           }
           else if (elab.compound) {
-            // console.error({compaound: elab.compound[1]});
             const flatList = reduceToFlatList(elab.compound);
-            console.error({flatList});
             const literalType = flatList.reduceRight((a, b) => {
               return [b, '<', a, '>'].join('');
             });
-            result.push(space + `${cleanKey}: ${literalType},`);
+            outStrm.write(space + `${cleanKey}: ${literalType},\n`);
           }
           else {
             throw new Error('no link or type ' + util.inspect(elab));
@@ -229,22 +248,21 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
           }
           else if (firstElem[generic.TypeMap] === true) {
             const literalType = (<any>firstElem)['typescript'];
-            result.push(space + `${cleanKey}: Array<${literalType}>`);
+            outStrm.write(space + `${cleanKey}: Array<${literalType}>\n`);
           }
           else if ((<any>rhs)[generic.Literal] === true) {
             const literalType = rhs.reverse().reduce((a, b) => {
               return [b, '<', a, '>'].join('');
             });
-            result.push(space + `${cleanKey}: Array<${literalType}>,`);
+            outStrm.write(space + `${cleanKey}: Array<${literalType}>,\n`);
           }
           else if ((<any>rhs)[generic.TypeMap] === true) {  // (<any>rhs)[simple] === true
             const literalType = (<any>rhs)['typescript'];
-            result.push(space + `${cleanKey}: Array<${literalType}>`);
+            outStrm.write(space + `${cleanKey}: Array<${literalType}>\n`);
           }
           else {
-            console.error('Creating default object type:', rhs);
             const literalType = (<any>defaults.Object)['typescript'];
-            result.push(space + `${cleanKey}: Array<${literalType}>`);
+            outStrm.write(space + `${cleanKey}: Array<${literalType}>\n`);
           }
         }
         
@@ -252,9 +270,9 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
       }
       
       if (withinInterface) {
-        result.push(space + `${cleanKey}: {`);
+        outStrm.write(space + `${cleanKey}: {\n`);
         loop(v[k], v, spaceCount, true);
-        result.push(space + '}');
+        outStrm.write(space + '}\n');
         continue;
       }
       
@@ -266,17 +284,17 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
       }
       
       if (startInterface) {
-        result.push(space + `export interface ${k} {`);
+        outStrm.write(space + `export interface ${k} {\n`);
       }
       else if (startClass) {
-        result.push(space + `export class ${k} {`);
+        outStrm.write(space + `export class ${k} {\n`);
       }
       else {
-        result.push(space + `export namespace ${k} {`);
+        outStrm.write(space + `export namespace ${k} {\n`);
       }
       
       loop(v[k], v, spaceCount, startInterface);
-      result.push(space + '}');
+      outStrm.write(space + '}\n');
       
     }
     
@@ -284,8 +302,12 @@ const generateToStream = (input: object, outStrm: stream.Writable, cb: EVCb<any>
   
   loop(input, null, 2, false);
   
+  outStrm.write('\n}');
+  outStrm.end();
+  
   process.nextTick(function(){
-    console.log(result.join('\n') + '\n}');
+
+    // console.log(result.join('\n') + '\n}');
     cb(null);
   });
   

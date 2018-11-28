@@ -8,7 +8,7 @@ import {Task} from "../../../generators";
 import * as util from "util";
 import * as path from "path";
 
-const run = require.resolve('./run');
+const run = require.resolve('./run.js');
 const inputFile = process.env.input_file;
 const confFile = process.env.conf_file;
 
@@ -24,7 +24,7 @@ assert.doesNotThrow(function () {
 );
 
 assert(
-  Object.keys(conf.default.langs).length > 0,
+  conf.default.tasks.length > 0,
   'You need at least one language to run against'
 );
 
@@ -47,17 +47,21 @@ async.eachLimit(tasks, 3, (t, cb) => {
   assert(generatorPath, 'No filepath given by task: ' + util.inspect(t));
   const outputDir = path.resolve(rootBuildFolder,outputFolder);
   
-  const k = cp.spawn('bash', [], {
-      env: Object.assign({}, process.env, {
-      
-      })
-  });
+  // const k = cp.spawn('bash', [], {
+  //     env: Object.assign({}, process.env, {
+  //
+  //     })
+  // });
+  
+  const k = cp.spawn('bash');
   
   const cmd = `
       mkdir -p "${outputDir}";
       node ${run} -p "${generatorPath}" -o "${outputDir}" -i "${inputFile}";
   `;
   
+  k.stdout.pipe(process.stdout);
+  k.stderr.pipe(process.stderr);
   k.stdin.end(cmd);
 
   k.once('exit', code => {

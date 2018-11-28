@@ -62,7 +62,7 @@ export const defaults  = {
 };
 
 
- const defs : LangMapMap = defaults;
+export const defs : LangMapMap = defaults;
 
 
 export const defaultArrayType = {

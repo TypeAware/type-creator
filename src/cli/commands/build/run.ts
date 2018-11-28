@@ -3,6 +3,7 @@
 import * as fs from 'fs';
 import * as path from "path";
 import {Generation} from "../../../generators";
+import {Transform, Writable} from "stream";
 
 /////////////////////////////////////////////////////
 
@@ -15,23 +16,50 @@ const outputDir = process.argv[index_o];
 const index_i = process.argv.indexOf('-i') + 1;
 const inputFile = process.argv[index_i];
 
-const gen = <Generation>require(generatorPath);
+const {generation} = <{generation:Generation}>require(generatorPath);
 
-const strm = fs.createWriteStream(path.resolve(outputDir + '/foo.ts'));
+// const strm = fs.createWriteStream(path.resolve(outputDir + '/foo1.js'));
+
+
+// const t = new Transform({
+//   transform(chunk, enc, cb){
+//     // console.log({chunk: String(chunk)});
+//     cb(null,String(chunk));
+//   }
+// });
+
+// const file = path.resolve(outputDir + '/foo2.js');
+
+const file = '/home/oleg/codes/oresoftware/types-depot/test/inner/output.js';
+console.error({file});
+
+const t = fs.createWriteStream(file, {flags: 'a', encoding: 'utf-8'});
+// t.pipe(fs.createWriteStream(file, {flags: 'w', encoding: 'utf-8',mode: 0o666}));
+
+t.write('zooooom', function(){
+  console.log('flushed');
+});
+
+console.log('super');
+// t.push('fudge');
 
 const {tc} = require(inputFile);
 
-const {entities} = tc.entities.get('default');
+const v = tc.entitiesMap.get('default');
 
-gen.generateToStream(entities, strm, err => {
+// console.log({v});
+// console.log({generation});
+
+generation.generateToStream(v, t, err => {
 
 
   if(err){
     throw err;
   }
 
+  console.log('Looks like things went well.');
   process.exit(0);
-  
+
 });
 
 

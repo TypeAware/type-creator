@@ -41,7 +41,7 @@ export class TypeCreator {
     return symbols.lang;
   }
   
-  getGenericSymbols(): typeof symbols.generic {
+  getCommonSymbols(): typeof symbols.generic {
     return symbols.generic;
   }
   
