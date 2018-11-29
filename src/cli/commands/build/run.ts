@@ -29,34 +29,9 @@ const [
 });
 
 const {generation} = <{ generation: Generation }>require(generatorPath);
-
-// const strm = fs.createWriteStream(path.resolve(outputDir + '/foo1.js'));
-
-// const t = new Transform({
-//   transform(chunk, enc, cb){
-//     // console.log({chunk: String(chunk)});
-//     cb(null,String(chunk));
-//   }
-// });
-
-const file = path.resolve(outputDir + '/' + outputFile);
-
-const t: any = null;
-// const t = fs.createWriteStream(file, {flags: 'a', encoding: 'utf-8'});
-// // t.pipe(fs.createWriteStream(file, {flags: 'w', encoding: 'utf-8',mode: 0o666}));
-//
-// t.write('zooooom', function(){
-//   console.log('flushed');
-// });
-
-// console.log('super');
-// t.push('fudge');
-
 const {tc} = require(inputFile);
 const v = tc.entitiesMap.get('default');
 
-// console.log({v});
-// console.log({generation});
 
 if (generation.generateToFiles) {
   
@@ -66,23 +41,30 @@ if (generation.generateToFiles) {
       throw err;
     }
     
-    console.log('Looks like things went well.');
-    process.exit(0);
+    console.log('Looks like things went well, not exiting.');
+    // process.exit(0);
     
+    setTimeout(()=>{},500);
   });
   
 }
 else {
   
-  generation.generateToStream(v, t, file, err => {
+  const file = path.resolve(outputDir + '/' + outputFile);
+  // t.pipe(fs.createWriteStream(file, {flags: 'w', encoding: 'utf-8',mode: 0o666}));
+  const t = fs.createWriteStream(file);
+  
+  generation.generateToStream(v, t, err => {
     
     if (err) {
       throw err;
     }
     
-    console.log('Looks like things went well.');
-    process.exit(0);
-    
+    console.log('Looks like things went well, not exiting.');
+    // process.exit(0);
+    setTimeout(()=>{},500);
+  
+  
   });
 }
 

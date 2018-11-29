@@ -58,11 +58,11 @@ const mapped = symlinks.map(v => {
     return [
       `mkdir -p "${shortDest}";`,
       `
-    if [[ -L "${d}" ]] || [[ -L "${destPluseBaseSrc}" ]]; then
-       ln -sf "${v.src}" "${d}";
-    else
-       ln -s "${v.src}" "${d}";
-    fi
+      if [[ -L "${d}" ]] || [[ -L "${destPluseBaseSrc}" ]]; then
+         ln -sf "${v.src}" "${d}";
+      else
+         ln -s "${v.src}" "${d}";
+      fi
    
     `].join(' ');
     

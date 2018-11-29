@@ -8,7 +8,7 @@ import {Writable} from "stream";
 import {EVCb} from "./shared";
 
 export interface Generation {
-  generateToStream?: (input: object, strm: Writable, file: string, cb: EVCb<any>) => void;
+  generateToStream?: (input: object, strm: Writable, cb: EVCb<any>) => void;
   generate?: () => void;
   generateToFiles?: (root: string, input: object, cb: EVCb<any>) => void;
   filePath: string

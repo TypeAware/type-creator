@@ -76,22 +76,21 @@ const appendFileHandler = (err: any, d?: any) => {
     console.error({err,d});
 };
 
-const generateToStream = (input: object, o: stream.Writable, file: string, cb: EVCb<any>) => {
+const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) => {
   
   // const input = require(src);
   // assert(input.entities, 'no entities exported from .js file.');
   
   const outStrm = {
     write(d: string){
-      fs.appendFileSync(file,d);
-      // fs.appendFile(file,d, appendFileHandler);
+      strm.write(d);
     },
     end(){
-    
+      strm.end()
     }
   };
   
-  console.log('zoooom');
+  
   outStrm.write('export namespace Entities {\n');
   
   const loop =  (v: any, parent: any, spaceCount: number, withinInterface: boolean) => {

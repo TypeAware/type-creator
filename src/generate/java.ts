@@ -132,19 +132,17 @@ const verifyLinkWrapper = (originalLink: string, v: any) => {
 
 const uniqueMarker = Symbol('unique.java.marker');
 
-const generateToStream = (input: object, o: stream.Writable, file: string, cb: EVCb<any>) => {
+const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) => {
   
   // const input = require(src);
   // assert(input.entities, 'no entities exported from .js file.');
   
-  
   const result = {
     push(d: string){
-      fs.appendFileSync(file,d + '\n');
-      // fs.appendFile(file,d, appendFileHandler);
+      strm.write(d + '\n');
     },
     end(){
-    
+      strm.end();
     }
   };
   
@@ -311,6 +309,7 @@ const generateToStream = (input: object, o: stream.Writable, file: string, cb: E
   
   loop(input, 2, false);
   result.push('}\n');
+  result.end();
   
   process.nextTick(function(){
     
