@@ -33,10 +33,8 @@ const {tc} = require(inputFile);
 const v = tc.entitiesMap.get('default');
 
 
-if (generation.generateToFiles) {
+const finish = (err: any) => {
   
-  generation.generateToFiles(outputDir, v, err => {
-    
     if (err) {
       throw err;
     }
@@ -44,28 +42,18 @@ if (generation.generateToFiles) {
     console.log('Looks like things went well, not exiting.');
     // process.exit(0);
     
-    setTimeout(()=>{},500);
-  });
-  
+    setTimeout(()=>{},100);
+};
+
+
+if (generation.generateToFiles) {
+  generation.generateToFiles(outputDir, v, finish);
 }
 else {
-  
   const file = path.resolve(outputDir + '/' + outputFile);
   // t.pipe(fs.createWriteStream(file, {flags: 'w', encoding: 'utf-8',mode: 0o666}));
   const t = fs.createWriteStream(file);
-  
-  generation.generateToStream(v, t, err => {
-    
-    if (err) {
-      throw err;
-    }
-    
-    console.log('Looks like things went well, not exiting.');
-    // process.exit(0);
-    setTimeout(()=>{},500);
-  
-  
-  });
+  generation.generateToStream(v, t, finish);
 }
 
 

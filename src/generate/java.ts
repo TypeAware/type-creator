@@ -17,7 +17,7 @@ const getString = (v: any) => {
   const ret = v[conf.lang];
   if (!ret) {
     const parent = v && v[symbols.generic.Parent];
-    const msg= parent ? 'parent is: ' + util.inspect(parent) : '';
+    const msg = parent ? 'parent is: ' + util.inspect(parent) : '';
     throw new Error(joinMessages(`Map does not contain key: "${conf.lang}"`, util.inspect(v), msg));
   }
   return ret;
@@ -65,9 +65,6 @@ const reduceToFlatList = function (list: Array<any>): Array<string> {
     ]
   );
 };
-
-
-
 
 const verifyLink = function (list: Array<string>, v: any, down: boolean, depth: number): boolean {
   
@@ -138,25 +135,30 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
   // assert(input.entities, 'no entities exported from .js file.');
   
   const result = {
-    push(d: string){
+    push(d: string) {
       strm.write(d + '\n');
     },
-    end(){
+    end() {
       strm.end();
     }
   };
   
   result.push('public class Entities {');
   
-  const loop = function (v: any, spaceCount: number, withinInterface: boolean) {
+  const loop = function (v: any, parent: any, spaceCount: number, withinInterface: boolean) {
     
     if (Array.isArray(v)) {
       throw new Error('Unexpected array object.');
     }
     
     const space = new Array(spaceCount).fill(null).join(' ');
-    
     const rn = v[symbols.generic.NSRename] = new Map<string, any>();
+    const prevPathStr = parent ? parent[symbols.generic.PathStr] : '';
+  
+    if(v[symbols.generic.AddPath]){
+      let p = [prevPathStr,v[symbols.generic.PathStr]].filter(Boolean).join('.');
+      result.push(space + `static ${'String'} ${'TypePath'} = "${p}";`);
+    }
     
     for (let k of Object.keys(v)) {
       
@@ -166,7 +168,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
       
       if (rhs && typeof rhs === 'object') {
         
-        if(!rhs[symbols.generic.TypeMap] && rhs[uniqueMarker]){
+        if (!rhs[symbols.generic.TypeMap] && rhs[uniqueMarker]) {
           throw new Error(
             'Circular reference detected in the config tree. Circular references not allowed.'
           );
@@ -175,6 +177,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
         rhs[uniqueMarker] = true;
         rhs[symbols.generic.Parent] = v;
         rhs[symbols.generic.NamespaceName] = k;
+        rhs[symbols.generic.PathStr] = [prevPathStr, k].filter(Boolean).join('.');
         rn.set(k, rhs);
       }
       
@@ -300,18 +303,18 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
         result.push(space + `static class ${k} {`);
       }
       
-      loop(v[k], spaceCount + 2, startInterface);
+      loop(rhs, v, spaceCount + 2, startInterface);
       result.push(space + '}');
       
     }
     
   };
   
-  loop(input, 2, false);
+  loop(input, null, 2, false);
   result.push('}\n');
   result.end();
   
-  process.nextTick(function(){
+  process.nextTick(function () {
     
     // console.log(result.join('\n') + '\n}');
     cb(null);
@@ -319,12 +322,10 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
   
 };
 
-
 export const generation = {
   generateToStream,
   filePath: __filename
 };
-
 
 // const f = process.env.input_file;
 // generate(path.resolve(f));
