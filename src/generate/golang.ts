@@ -10,6 +10,7 @@ import * as util from "util";
 import * as symbols from "../symbols";
 import {TypeElaboration} from "../type-utils";
 import {any} from "async";
+import {Writable} from "stream";
 
 const {conf} = new Lang({lang: 'golang'});
 
@@ -72,10 +73,13 @@ const reduceToFlatList = function (list: Array<any>): Array<string> {
   );
 };
 
-const createFileLooper = (strm: any, results: Array<any>) => {
+const createFileLooper = (strm: Writable, results: Array<any>) => {
   return function loop(v: any, spaceCount: number, depth: number) {
     
     const space = new Array(spaceCount).fill(null).join(' ');
+  
+    const currPathStr = v[symbols.generic.PathStr] || '';
+
     
     for (let k of Object.keys(v)) {
       
@@ -187,6 +191,10 @@ const createFileLooper = (strm: any, results: Array<any>) => {
       
       if (depth === 0) {
         strm.write(space + `type ${upperKey} struct {\n`);
+        {
+          let p = [currPathStr, k].filter(Boolean).join('.');
+          strm.write(space + ' ' + 'TypePath string `tc:"' + p + '"`\n');
+        }
       }
       else {
         strm.write(space + `${upperKey} struct {\n`);
@@ -328,12 +336,11 @@ export const generateToFiles = (root: string, input: object, cb: EVCb<any>): voi
         callback(null);
         
         const rn = v[symbols.generic.NSRename] = new Map<string, any>();
+        const currPathStr = v[symbols.generic.PathStr] || '';
         const space = new Array(spaceCount).fill(null).join(' ');
         spaceCount += 2;
         
         const results: Array<any> = [];
-  
-        console.log({dir,startEntity});
         
         if (startFile) {
           
@@ -365,6 +372,7 @@ export const generateToFiles = (root: string, input: object, cb: EVCb<any>): voi
           if (rhs && typeof rhs === 'object') {
             rhs[symbols.generic.Parent] = v;
             rhs[symbols.generic.NamespaceName] = k;
+            rhs[symbols.generic.PathStr] = [currPathStr, k].filter(Boolean).join('.');
             rn.set(k, rhs);
           }
           
