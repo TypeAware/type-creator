@@ -153,11 +153,10 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
     
     const space = new Array(spaceCount).fill(null).join(' ');
     const rn = v[symbols.generic.NSRename] = new Map<string, any>();
-    const prevPathStr = parent ? parent[symbols.generic.PathStr] : '';
+    const currPathStr = v[symbols.generic.PathStr] || '';
   
-    if(v[symbols.generic.AddPath]){
-      let p = [prevPathStr,v[symbols.generic.PathStr]].filter(Boolean).join('.');
-      result.push(space + `static ${'String'} ${'TypePath'} = "${p}";`);
+    if(v[symbols.generic.AddPath] && currPathStr){
+      result.push(space + `static ${'String'} ${'TypePath'} = "${currPathStr}";`);
     }
     
     for (let k of Object.keys(v)) {
@@ -177,7 +176,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
         rhs[uniqueMarker] = true;
         rhs[symbols.generic.Parent] = v;
         rhs[symbols.generic.NamespaceName] = k;
-        rhs[symbols.generic.PathStr] = [prevPathStr, k].filter(Boolean).join('.');
+        rhs[symbols.generic.PathStr] = [currPathStr, k].filter(Boolean).join('.');
         rn.set(k, rhs);
       }
       
