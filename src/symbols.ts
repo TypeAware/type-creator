@@ -58,6 +58,10 @@ export const lang = {
     Class: Symbol('swift.class')
   },
   
+  json: {
+  
+  }
+  
 };
 
 export const special = {

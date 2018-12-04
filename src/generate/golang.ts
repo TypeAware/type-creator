@@ -59,7 +59,7 @@ const reduceToFlatList = function (list: Array<any>): Array<string> {
         const pop = getStringFromTypeMap(a.pop());
         // const format = util.format(pop, ...reduceToFlatList(b));
         const format = reduceToFlatList(b).reduce((n, t) => n.replace('?', t), pop);
-        return (a.push(format.replace(/\?/g, 'any')), a); // we replace any remaining "?" chars with "any"
+        return (a.push(format.replace(/\?/g, 'interface{}')), a); // we replace any remaining "?" chars with "interface{}"
       }
       
       const str = getStringFromTypeMap(b);
