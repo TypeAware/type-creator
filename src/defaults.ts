@@ -22,7 +22,7 @@ export const defaults  = {
     golang: 'int',
     java: 'int',
     typescript: 'number',
-    swift: 'int',
+    swift: 'Int',
     json: '"int"'
   }),
   
@@ -30,7 +30,7 @@ export const defaults  = {
     golang: 'string',
     java: 'String',
     typescript: 'string',
-    swift: 'strAng',
+    swift: 'String',
     json: '"string"'
   }),
   
@@ -38,7 +38,7 @@ export const defaults  = {
     golang: 'bool',
     java: 'boolean',
     typescript: 'boolean',
-    swift: 'boolean',
+    swift: 'Bool',
     json: '"boolean"'
   }),
   
@@ -51,12 +51,21 @@ export const defaults  = {
   }),
   
   Map: setTypeMap({
-    golang: 'struct {}',
-    java: `Map`,
+    golang: 'map[?]?',
+    java: `Map<?,?>`,
     typescript: '{}',
     swift: 'Object',
     json: '{}'
   }),
+  
+  Set: setTypeMap({
+    golang: 'map[?]?',
+    java: `Set`,
+    typescript: 'Set',
+    swift: 'Set',
+    json: '[]'
+  }),
+  
   
   Array: setTypeMap({
     golang: '[]',

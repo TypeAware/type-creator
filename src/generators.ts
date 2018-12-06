@@ -4,6 +4,7 @@ import * as ts from './generate/typescript';
 import * as java from './generate/java';
 import * as golang from './generate/golang'
 import * as json from './generate/json'
+import * as swift from './generate/swift';
 
 import {Writable} from "stream";
 import {EVCb} from "./shared";
@@ -31,7 +32,8 @@ export const generators = {
   typescript: ts.generation,
   java: java.generation,
   golang: golang.generation,
-  json: json.generation
+  json: json.generation,
+  swift: swift.generation
   
 };
 
