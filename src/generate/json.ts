@@ -102,6 +102,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
       throw new Error('Unexpected array object.');
     }
   
+    const map: {[key:string]: string} = curr['nameMap'] = {};
     const value: any = curr['value'] = {};
     value[parentSymbol] = curr;
     
@@ -111,6 +112,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
       const rhs = v[k];
       
       if (rhs && typeof rhs === 'object') {
+        map[k] = k;
         rhs[generic.Parent] = v;
         rhs[generic.NamespaceName] = k;
       }
