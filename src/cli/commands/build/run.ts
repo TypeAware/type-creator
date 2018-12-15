@@ -19,6 +19,9 @@ const inputFile = process.argv[index_i];
 const index_f = process.argv.indexOf('-f') + 1;
 const outputFile = process.argv[index_f];
 
+
+console.log({generatorPath});
+
 const {generation} = <{generation:Generation}>require(generatorPath);
 
 // const strm = fs.createWriteStream(path.resolve(outputDir + '/foo1.js'));
@@ -52,32 +55,32 @@ const v = tc.entitiesMap.get('default');
 // console.log({generation});
 
 if(generation.generateToFiles){
-  
-  
+
+
   generation.generateToFiles(outputDir,v, err => {
-  
+
     if(err){
       throw err;
     }
-  
+
     console.log('Looks like things went well.');
     process.exit(0);
-    
+
   });
-  
+
 }
 else{
-  
+
   generation.generateToStream(v, t, file, err => {
-    
-    
+
+
     if(err){
       throw err;
     }
-    
+
     console.log('Looks like things went well.');
     process.exit(0);
-    
+
   });
 }
 
