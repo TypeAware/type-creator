@@ -14,28 +14,32 @@ export const defaults  = {
     golang: 'float32',
     java: 'double',
     typescript: 'number',
-    swift: 'double'
+    swift: 'double',
+    json: '"number"'
   }),
   
   Int: setTypeMap({
     golang: 'int',
     java: 'int',
     typescript: 'number',
-    swift: 'int',
+    swift: 'Int',
+    json: '"int"'
   }),
   
   String: setTypeMap({
     golang: 'string',
     java: 'String',
     typescript: 'string',
-    swift: 'strAng',
+    swift: 'String',
+    json: '"string"'
   }),
   
   Boolean: setTypeMap({
     golang: 'bool',
     java: 'boolean',
     typescript: 'boolean',
-    swift: 'boolean',
+    swift: 'Bool',
+    json: '"boolean"'
   }),
   
   Object: setTypeMap({
@@ -43,20 +47,32 @@ export const defaults  = {
     java: `Object`,
     typescript: '{}',
     swift: 'Object',
+    json: '{}'
   }),
   
   Map: setTypeMap({
-    golang: 'struct {}',
-    java: `Map`,
+    golang: 'map[?]?',
+    java: `Map<?,?>`,
     typescript: '{}',
     swift: 'Object',
+    json: '{}'
   }),
+  
+  Set: setTypeMap({
+    golang: 'map[?]?',
+    java: `Set`,
+    typescript: 'Set',
+    swift: 'Set',
+    json: '[]'
+  }),
+  
   
   Array: setTypeMap({
     golang: '[]',
     java: `List`,
     typescript: 'Array',
     swift: 'DunnoXXX',
+    json: '[]'
   }),
   
 };

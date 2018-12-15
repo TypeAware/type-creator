@@ -2,12 +2,13 @@
 
 // TODO: all these symbols should be uppercase first char
 
- interface SymbolMap {
-  [key:string]: symbol
+interface SymbolMap {
+  [key: string]: symbol
 }
 
 export const generic = {
-  
+  PathStr: Symbol('generic.path.string'),
+  AddPath: Symbol('generic.add.path'),
   Literal: Symbol('literal'),
   Type: Symbol('type'),
   Simple: Symbol('simple.type.inference'),
@@ -26,10 +27,10 @@ export const generic = {
 };
 
 // local type check
-const generik : SymbolMap = generic;
+const generik: SymbolMap = generic;
 
 interface SymbolMapMap {
-  [key:string]: SymbolMap
+  [key: string]: SymbolMap
 }
 
 export const lang = {
@@ -57,8 +58,11 @@ export const lang = {
     Class: Symbol('swift.class')
   },
   
+  json: {
+  
+  }
+  
 };
-
 
 export const special = {
   chld: {
@@ -66,7 +70,6 @@ export const special = {
   }
 };
 
-
-const lng : SymbolMapMap = lang;
+const lng: SymbolMapMap = lang;
 
 

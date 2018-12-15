@@ -11,7 +11,7 @@ import * as fs from "fs";
 
 //////////////////////////////////////////////////////
 
-const {conf} = new Lang({lang: 'java'});
+const {conf} = new Lang({lang: 'swift'});
 
 const getString = (v: any) => {
   const ret = v[conf.lang];
@@ -53,7 +53,7 @@ const reduceToFlatList = function (list: Array<any>): Array<string> {
         const pop = getStringFromTypeMap(a.pop());
         // const format = util.format(pop, ...reduceToFlatList(b));
         const format = reduceToFlatList(b).reduce((n, t) => n.replace('?', t), pop);
-        return (a.push(format.replace(/\?/g, 'any')), a); // we replace any remaining "?" chars with "any"
+        return (a.push(format.replace(/\?/g, 'Any')), a); // we replace any remaining "?" chars with "Any" => swifts any type
       }
       
       const str = getStringFromTypeMap(b);
@@ -127,7 +127,7 @@ const verifyLinkWrapper = (originalLink: string, v: any) => {
   }
 };
 
-const uniqueMarker = Symbol('unique.java.marker');
+const uniqueMarker = Symbol('unique.swift.marker');
 
 const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) => {
   
@@ -154,9 +154,9 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
     const space = new Array(spaceCount).fill(null).join(' ');
     const rn = v[symbols.generic.NSRename] = new Map<string, any>();
     const currPathStr = v[symbols.generic.PathStr] || '';
-  
+    
     if(v[symbols.generic.AddPath] && currPathStr){
-      result.push(space + `static ${'String'} ${'TypePath'} = "${currPathStr}";`);
+      result.push(space + `var TypePath: String = "${currPathStr}"`);
     }
     
     for (let k of Object.keys(v)) {
@@ -186,7 +186,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
           throw new Error('Parent has a "chld.literal" tag, but child value is not a string.');
         }
         
-        result.push(space + `${rhs} ${cleanKey};`);
+        result.push(space + `var ${cleanKey}: ${rhs}?`);
         continue;
       }
       
@@ -194,7 +194,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
         if (!(rhs && typeof rhs === 'string')) {
           throw new Error('Literal type string assumed, but it is not a string or undefined/empty => ' + util.inspect(rhs));
         }
-        result.push(space + `${rhs} ${cleanKey};`);
+        result.push(space + `var ${cleanKey}: ${rhs}?`);
         continue;
       }
       
@@ -204,7 +204,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
           throw new Error('Has a "literal" tag, but value prop is undefined or is not a string.');
         }
         
-        result.push(space + `${rhs.value} ${cleanKey};`);
+        result.push(space + `var ${cleanKey}: ${rhs.value}?`);
         continue;
       }
       
@@ -212,7 +212,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
         {
           const val = rhs.link;
           verifyLinkWrapper(val, rhs);
-          result.push(space + `${val} ${cleanKey};`);
+          result.push(space + `var ${cleanKey}: ${val}?`);
         }
         continue;
       }
@@ -220,7 +220,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
       if (rhs[symbols.generic.TypeMap] === true) {
         {
           const val = getString(rhs);
-          result.push(space + `${val} ${cleanKey};`);
+          result.push(space + `var ${cleanKey}: ${val}?`);
         }
         continue;
       }
@@ -235,11 +235,11 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
           
           if (elab.type) {
             const val = getString(elab);
-            result.push(space + `${val} ${cleanKey};`);
+            result.push(space + `var ${cleanKey}: ${val}?`);
           }
           else if (elab.link) {
             verifyLinkWrapper(elab.link, v);
-            result.push(space + `${elab.link} ${cleanKey};`);
+            result.push(space + `var ${cleanKey}: ${elab.link}?`);
           }
           else if (elab.linkfn) {
             
@@ -257,7 +257,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
             }
             
             verifyLinkWrapper(name, v);
-            result.push(space + `${String(name)} ${cleanKey};`);
+            result.push(space + `var ${cleanKey}: ${String(name)}?`);
           }
           else if (elab.compound) {
             // console.error({compaound: elab.compound[1]});
@@ -266,7 +266,7 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
             const literalType = flatList.reduceRight((a, b) => {
               return [b, '<', a, '>'].join('');
             });
-            result.push(space + `${literalType} ${cleanKey};`);
+            result.push(space + `var ${cleanKey}: ${literalType}?`);
           }
           else {
             throw new Error('no link or type ' + util.inspect(elab));
@@ -283,23 +283,24 @@ const generateToStream = (input: object, strm: stream.Writable, cb: EVCb<any>) =
           const literalType = getString(type);
           
           if (value === undefined) { // TODO: check array length instead of for undefined
-            result.push(space + `${literalType} ${cleanKey};`);
+            result.push(space + `var ${cleanKey}: ${literalType}?`);
           }
           else {
-            result.push(space + `${literalType} ${cleanKey} = ${value};`);
+            result.push(space + `var ${cleanKey}: ${literalType} = ${value}`);
           }
           
         }
         continue;
       }
       
-      let startInterface = rhs[symbols.lang.java.Interface] === true;
+      let startInterface = rhs[symbols.lang.swift.Class] === true;
       
       if (startInterface) {
-        result.push(space + `static interface ${k} {`);
+        // result.push(space + `static interface ${k} {`);
+        result.push(space + `class ${k} {`);
       }
       else {
-        result.push(space + `static class ${k} {`);
+        result.push(space + `class ${k} {`);
       }
       
       loop(rhs, v, spaceCount + 2, startInterface);

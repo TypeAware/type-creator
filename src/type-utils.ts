@@ -11,7 +11,8 @@ export interface LangMap {
   golang: string,
   typescript: string,
   java: string,
-  swift: string
+  swift: string,
+  json: string
 }
 
 const typeMapPrototype = {
