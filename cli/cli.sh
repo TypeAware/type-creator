@@ -2,7 +2,9 @@
 
 #link="$(readlink -f "$BASH_SOURCE")";
 
-link="$(readlink -f "$0")"
+# link="$(readlink -f "$0")"
+
+link="$(realpath "$0")"
 package_root="$(cd "$(dirname "$(dirname "$link")")" && pwd)"
 
 
