@@ -38,50 +38,53 @@ assert(
 
 
 async.eachLimit(tasks, 3, (t, cb) => {
-  
+
   const generatorPath = t.gen.filePath;
   const outputFolder = t.output.folder;
   const outputFile = t.output.file;
-  
+
   assert(outputFolder, 'No outputFolder given by task: ' + util.inspect(t));
   assert(generatorPath, 'No filepath given by task: ' + util.inspect(t));
   assert(outputFile, 'No output file given by task: ' + util.inspect(t));
   const outputDir = path.resolve(rootBuildFolder,outputFolder);
-  
+
   // const k = cp.spawn('bash', [], {
   //     env: Object.assign({}, process.env, {
   //
   //     })
   // });
-  
+
   const k = cp.spawn('bash');
-  
+
   const cmd = `
       mkdir -p "${outputDir}";
       node ${run} -p '${generatorPath}' -o '${outputDir}' -i '${inputFile}' -f '${outputFile}';
   `;
-  
+
+
+  console.log('running cmd:', cmd);
   k.stdout.pipe(process.stdout);
   k.stderr.pipe(process.stderr);
+
   k.stdin.end(cmd);
 
   k.once('exit', code => {
-  
+
     let err = null;
-    
+
     if(code > 0){
       console.error('Could not run command:', cmd, 'successfully.');
       err = new Error(String(code));
     }
-    
+
     cb(err);
-    
+
   });
 
 }, err => {
-  
+
   if(err){
     throw err;
   }
-  
+
 });
