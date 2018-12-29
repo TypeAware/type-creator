@@ -4,22 +4,22 @@
 
 link="$(readlink -f "$0")"
 package_root="$(cd "$(dirname "$(dirname "$link")")" && pwd)"
-
+commands="$package_root/dist/cli/commands"
 
 first_arg="$1";
 shift 1;
 
 if [[ "$first_arg" == "build" ]]; then
 
-   node "$package_root/dist/cli/commands/build" "$@"
+   node "/build" "$@"
 
 elif [[ "$first_arg" == "symlink" || "$first_arg" == "symlinks" ]]; then
 
-   node "$package_root/dist/cli/commands/symlink" "$@"
+   node "$commands/symlink" "$@"
 
 else
 
-   node "$package_root/dist/cli/commands/default" "$@"
+   node "$commands/default" "$@"
 
 fi
 
